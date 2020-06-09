@@ -3,19 +3,18 @@
 //
 
 #pragma once
-#include <include/IList.hpp>
-template <typename T>
-class linked_list :public IList<T>{
-public:
-    typedef T element_type;
-    void append() override ;
-    void prepend() override ;
-    void appendall() override;
-    void insertat() override;
-    void removeat() override;
-    void removeall() override;
-    int pop() override;
-    int dequeue() override;
-    int length() override;
-    int getat() override;
-};
+//template <typename T>
+//class linked_list{
+//public:
+//    int size_;
+//    void append();
+//    void prepend();
+//    void appendall();
+//    void insertat();
+//    void removeat();
+//    void removeall();
+//    int pop();
+//    int dequeue();
+//    int length();
+//    int getat();
+//};
