@@ -17,22 +17,23 @@ class array_list {
 public:
     typedef T element_type;
     array_list(array_list &&arrayList) noexcept;
-    explicit array_list(int size = 0);
+    explicit array_list(int capacity);
     array_list(const array_list &arrayList);
     array_list(const std::initializer_list<T> &list);
     array_list<T> &operator=(const array_list &arrayList);
     void append(const T &value);
     void prepend(const T &value);
     template<typename ICollection>
-    void appendall(const ICollection *arr);
+    void appendall(ICollection &arr) ;
     void insertat(const T &value, int index);
     void removeat(int index);
     void removeall();
     T pop();             //if pop or dequeue return T& -> SIGFLT
     T dequeue();
     int length() const;
-    T getat(int index) const;
+    const T& getat(int index) const;
     T &operator[](int index);
+    const T &operator[](int index) const;
     T *begin() {
         return &arr_[0];
     }
@@ -44,7 +45,7 @@ public:
 
 template<typename T>
 array_list<T>::array_list(const array_list &arrayList) : size_(arrayList.size_), capacity_(arrayList.capacity_) {
-    arr_ = new T[size_];
+    arr_ = new T[capacity_];
     for (int i = 0; i < size_; i++) {
         arr_[i] = arrayList.arr_[i];
     }
@@ -57,7 +58,7 @@ array_list<T>::array_list(array_list &&arrayList) noexcept : arr_(arrayList.arr_
 }
 
 template<typename T>
-array_list<T>::array_list(int size) : size_(size), capacity_(size * 2) {
+array_list<T>::array_list(int capacity) : size_(0), capacity_(capacity) {
     arr_ = new T[capacity_];
 }
 
@@ -89,9 +90,8 @@ array_list<T> &array_list<T>::operator=(const array_list &arrayList) {
 template<typename T>
 void array_list<T>::extend_capacity(int n) {
     if (size_ + n > capacity_) {
-        while (size_ + n > capacity_) {
-            capacity_ *= 2;
-        }
+        int x = 1 + (size_ + n)/ capacity_;
+        capacity_ *= x;
         T *new_arr = new T[capacity_];
         for (int i = 0; i < size_; i++) {
             new_arr[i] = arr_[i];
@@ -135,12 +135,14 @@ void array_list<T>::prepend(const T &value) {
 
 template<typename T>
 template<typename ICollection>
-void array_list<T>::appendall(const ICollection *arr) {
-    extend_capacity(arr->length());
-    for (int i = 0; i < arr->length(); i++) {
-        arr_[i + size_] = arr->getat(i);
+void array_list<T>::appendall(ICollection &arr) {
+    extend_capacity(arr.length());
+    int i = 0;
+    for (auto element :arr) {
+        arr_[i + size_] = element;
+        i++;
     }
-    size_ += arr->length();
+    size_ += arr.length();
 }
 
 template<typename T>
@@ -160,6 +162,8 @@ template<typename T>
 void array_list<T>::removeat(int index) {
     if (index > size_) {
         throw std::invalid_argument("Invalid argument: index bigger than size");
+    } else if (index < 0){
+        throw std::invalid_argument("Invalid argument: index less than zero");
     }
     for (int i = index; i < size_; i++) {
         arr_[i] = arr_[i + 1];
@@ -193,7 +197,7 @@ int array_list<T>::length() const {
     return size_;
 }
 template<typename T>
-T array_list<T>::getat(int index) const {
+const T& array_list<T>::getat(int index) const { //TODO: Fix
     if (index > size_) {
         throw std::invalid_argument("Invalid argument: index bigger than size");
     }
@@ -201,9 +205,10 @@ T array_list<T>::getat(int index) const {
 }
 template<typename T>
 T &array_list<T>::operator[](int index) {
-    if (index > size_) {
-        throw std::invalid_argument("Invalid argument: index bigger than size");
-    }
+    return arr_[index];
+}
+template<typename T>
+const T &array_list<T>::operator[](int index) const{
     return arr_[index];
 }
 template<typename T>

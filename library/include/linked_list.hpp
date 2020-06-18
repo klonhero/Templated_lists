@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "include/node.hpp"
+#include <node.hpp>
 #include <cassert>
 #include <initializer_list>
 #include <stdexcept>
@@ -11,37 +11,56 @@ template<typename T>
 class linked_list {
     node<T> *head_;
     node<T> *tail_;
-    int size_;
+
     node<T> *create_list(int size);
 
 public:
-//    class iterator {
-//    public:
-//        typedef T value_type;
-//        typedef std::forward_iterator_tag iterator_category;
-//        typedef int difference_type;
-//
-//        // конструктор
-//        iterator(T* ptr) : ptr_(ptr) { }
-//
-//        iterator operator++();
-//        iterator operator++(int junk);
-//        T& operator*();
-//        T* operator->();
-//        bool operator==(const iterator& rhs);
-//        bool operator!=(const iterator& rhs);
-//    };
+    class iterator {
+        node<T> *ptr_ = nullptr;
+
+    public:
+        typedef T value_type;
+        typedef std::forward_iterator_tag iterator_category;
+        typedef int difference_type;
+
+        // конструктор
+        explicit iterator(node<value_type> *ptr) : ptr_(ptr) {}
+
+        iterator operator++() {
+            ptr_ = ptr_->getnext();
+            return *this;
+        }
+        iterator operator++(int junk) {
+            auto temp = ptr_;
+            ptr_ = ptr_->getnext();
+            return temp;
+        }
+        value_type &operator*() {
+            return ptr_->get();
+        }
+        value_type *operator->() {
+            return &ptr_->get();
+        }
+        bool operator==(const iterator &rhs) {
+            return rhs.ptr_ == ptr_;
+        }
+        bool operator!=(const iterator &rhs) {
+            return rhs.ptr_ != ptr_;
+        }
+    };
+    typedef int size;
     typedef T element_type;
+    size size_;
     linked_list(linked_list &&linkedList) noexcept;
-    explicit linked_list(int size = 0);
+    explicit linked_list(size size = 0);
     linked_list(const linked_list &linkedList);
     linked_list(const std::initializer_list<T> &list);
     linked_list<T> &operator=(const linked_list &linkedList);
-    void append(const T &value);
-    void prepend(const T &value);
+    void append(const element_type &value);
+    void prepend(const element_type &value);
     template<typename ICollection>
-    void appendall(const ICollection *arr);
-    void insertat(const T &value, int index);
+    void appendall(const ICollection &arr);
+    void insertat(const element_type &value, int index);
     void removeat(int index);
     void removeall();
     T pop();
@@ -49,12 +68,13 @@ public:
     int length() const;
     T getat(int index) const;
     T &operator[](int index);
-//        T *begin() {
-//            return &(head_->get());
-//        }
-//        T *end() {
-//            return &(tail_->get());
-//        }
+    const T &operator[](int index) const;
+    iterator begin() {
+        return iterator(head_);
+    }
+    iterator end() {
+        return iterator(tail_->getnext());
+    }
     virtual ~linked_list();
 };
 
@@ -69,7 +89,7 @@ template<typename T>
 linked_list<T>::linked_list(int size) : size_(size) {
     head_ = create_list(size_);
     tail_ = head_;
-    for (int i = 0; i < size_ -1  ; i++) {
+    for (int i = 0; i < size_ - 1; i++) {
         tail_ = tail_->getnext();
     }
 }
@@ -88,9 +108,9 @@ linked_list<T>::linked_list(const linked_list &linkedList) {
 
 template<typename T>
 node<T> *linked_list<T>::create_list(int size) {
-    auto* head = new node<T>;
+    auto *head = new node<T>;
     node<T> *tail = head;
-    for (int i = 0; i < size-1; i++) {
+    for (int i = 0; i < size - 1; i++) {
         tail->setnext(new node<T>);
         tail = tail->getnext();
     }
@@ -104,8 +124,10 @@ linked_list<T>::linked_list(const std::initializer_list<T> &list) {
     auto temp = head_;
     for (auto &i : list) {
         temp->set(i);
-        tail_ = temp;
-        temp = temp->getnext();
+        if (temp != nullptr) {
+            tail_ = temp;
+            temp = temp->getnext();
+        }
     }
 }
 
@@ -154,7 +176,7 @@ T &linked_list<T>::operator[](int index) {
     for (int i = 0; i < index; i++) {
         temp = temp->getnext();
     }
-    return temp->take();
+    return temp->get();
 }
 
 template<typename T>
@@ -169,21 +191,32 @@ T linked_list<T>::getat(int index) const {
     return temp->get();
 }
 template<typename T>
-void linked_list<T>::append(const T &value) {
-    tail_->setnext(new node<T>());
-    tail_ = tail_->getnext();
-    tail_->set(value);
+void linked_list<T>::append(const element_type &value) {
+    if (size_ == 0) {
+        head_ = create_list(1);
+        head_->set(value);
+        tail_ = head_;
+    } else {
+        tail_->setnext(new node<T>());
+        tail_ = tail_->getnext();
+        tail_->set(value);
+    }
     size_++;
 }
 template<typename T>
-void linked_list<T>::prepend(const T &value) {
-    auto temp = new node<T>;
+void linked_list<T>::prepend(const element_type &value) {
+    if (size_ == 0) {
+        head_ = create_list(1);
+        head_->set(value);
+        tail_ = head_;
+    }
+    auto temp = new node<element_type>;
     temp->setnext(head_);
     head_ = temp;
     size_++;
 }
 template<typename T>
-void linked_list<T>::insertat(const T &value, int index) {
+void linked_list<T>::insertat(const element_type &value, int index) {
     if (index > size_) {
         throw std::invalid_argument("Invalid argument: index bigger than size");
     }
@@ -191,11 +224,15 @@ void linked_list<T>::insertat(const T &value, int index) {
         prepend(value);
         return;
     }
+    if (index == size_) {
+        append(value);
+        return;
+    }
     auto temp = head_;
     for (int i = 0; i < index - 1; i++) {
         temp = temp->getnext();
     }
-    temp->setnext(new node<T>);
+    temp->setnext(new node<element_type>);
     temp = temp->getnext();
     temp->set(value);
     size_++;
@@ -206,7 +243,7 @@ void linked_list<T>::removeat(int index) {
         throw std::invalid_argument("Invalid argument: index bigger than size");
     }
     auto temp = head_;
-    node<T> *temp_previous;
+    node<element_type> *temp_previous;
     for (int i = 0; i < index; i++) {
         temp_previous = temp;
         temp = temp->getnext();
@@ -228,13 +265,13 @@ void linked_list<T>::removeall() {
 }
 template<typename T>
 template<typename ICollection>
-void linked_list<T>::appendall(const ICollection *arr) {
-    tail_->setnext(create_list(arr->length()));
-    for (int i = 0; i < arr->length(); i++) {
+void linked_list<T>::appendall(const ICollection &arr) {
+    tail_->setnext(create_list(arr.length()));
+    for (int i = 0; i < arr.length(); i++) {
         tail_ = tail_->getnext();
-        tail_->set(arr->getat(i));
+        tail_->set(arr.getat(i));
     }
-    size_ += arr->length();
+    size_ += arr.length();
 }
 template<typename T>
 T linked_list<T>::pop() {
@@ -242,7 +279,7 @@ T linked_list<T>::pop() {
         throw std::invalid_argument("you can't use pop nothing to return (size = 0)");
     }
     auto temp = head_;
-    for (int i = 0; i< size_ - 1; i++){
+    for (int i = 0; i < size_ - 1; i++) {
         temp = temp->getnext();
     }
     size_ = 0;
@@ -254,7 +291,7 @@ T linked_list<T>::dequeue() {
     }
     auto temp = head_;
     head_ = head_->getnext();
-    T temp_2 = temp->get();
+    element_type temp_2 = temp->get();
     delete temp;
     return temp_2;
 }
@@ -262,4 +299,15 @@ T linked_list<T>::dequeue() {
 template<typename T>
 int linked_list<T>::length() const {
     return size_;
+}
+template<typename T>
+const T &linked_list<T>::operator[](int index) const {
+    if (index > size_) {
+        throw std::invalid_argument("Invalid argument: index bigger than size");
+    }
+    auto temp = head_;
+    for (int i = 0; i < index; i++) {
+        temp = temp->getnext();
+    }
+    return temp->get();
 }

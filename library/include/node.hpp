@@ -13,10 +13,9 @@ public:
     explicit node(T value, node *next = nullptr);
     node() = default;
     node<T> &operator=(const node &Node);
-    T get() const;           //return value_
-    T& take();
+    T& get();           //return value_
     void set(T value);       //set value in value_
-    node<T> *getnext() const;//return pointer to next node;
+    node<T> *getnext();//return pointer to next node;
     void setnext(node<T> *next);//set next in next_
 };
 
@@ -41,7 +40,7 @@ node<T> &node<T>::operator=(const node &Node) {
 }
 
 template<typename T>
-T node<T>::get() const {
+T& node<T>::get() {
     return value_;
 }
 
@@ -51,7 +50,7 @@ void node<T>::set(T value) {
 }
 
 template<typename T>
-node<T> *node<T>::getnext() const {
+node<T> *node<T>::getnext() {
     return next_;
 }
 
@@ -59,7 +58,3 @@ template<typename T>
 void node<T>::setnext(node *next) {
     next_ = next;
 }
-template<typename T>
-T &node<T>::take() {
-    return value_;
-};

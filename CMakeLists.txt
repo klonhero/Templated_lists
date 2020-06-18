@@ -3,13 +3,21 @@ project(templated_lists)
 
 set(CMAKE_CXX_STANDARD 14)
 
-#add_executable(templated_lists main.cpp)
-set(PROJECT_HEADERS_DIR ${PROJECT_SOURCE_DIR})
-set(PROJECT_SOURCES_DIR ${PROJECT_SOURCE_DIR})
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake")
 
-file(GLOB_RECURSE HEADERS ${PROJECT_HEADERS_DIR}/include/*.h)
-file(GLOB_RECURSE HEADERS ${PROJECT_SOURCES_DIR}/src/*.cpp)
+include(CMake/googletest.cmake)
+fetch_googletest(${PROJECT_SOURCE_DIR}/CMake ${PROJECT_BINARY_DIR}/googletest)
+enable_testing()
+add_subdirectory(library)
 
-add_executable(templated_lists ${HEADERS} ${SOURCES})
+add_subdirectory(src)
 
-include_directories(${PROJECT_HEADERS_DIR})
+#set(PROJECT_HEADERS_DIR ${PROJECT_SOURCE_DIR})
+#set(PROJECT_SOURCES_DIR ${PROJECT_SOURCE_DIR})
+#
+#file(GLOB_RECURSE HEADERS ${PROJECT_HEADERS_DIR}/include/*.h)
+#file(GLOB_RECURSE HEADERS ${PROJECT_SOURCES_DIR}/src/*.cpp)
+#
+#add_executable(templated_lists ${HEADERS} ${SOURCES})
+#
+#include_directories(${PROJECT_HEADERS_DIR})
