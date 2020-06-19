@@ -10,7 +10,7 @@ class node {
 
 public:
     node(const node &Node);
-    explicit node(T value, node *next = nullptr);
+    explicit node(T value);
     node() = default;
     node<T> &operator=(const node &Node);
     T& get();           //return value_
@@ -26,9 +26,9 @@ node<T>::node(const node &Node) {
     next_ = nullptr;
 }
 
-template<typename T>
-node<T>::node(T value, node *next) : value_(value), next_(next) {
-}
+//template<typename T>
+//node<T>::node(T value, node *next) : value_(value), next_(next) {
+//}
 
 template<typename T>
 node<T> &node<T>::operator=(const node &Node) {
@@ -57,4 +57,8 @@ node<T> *node<T>::getnext() {
 template<typename T>
 void node<T>::setnext(node *next) {
     next_ = next;
+}
+template<typename T>
+node<T>::node(T value) {
+    next_ = nullptr;
 }

@@ -22,6 +22,7 @@ public:
     array_list(const std::initializer_list<T> &list);
     array_list<T> &operator=(const array_list &arrayList);
     void append(const T &value);
+
     void prepend(const T &value);
     template<typename ICollection>
     void appendall(ICollection &arr) ;

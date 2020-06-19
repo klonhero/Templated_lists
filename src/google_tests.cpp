@@ -1,12 +1,13 @@
 //
 // Created by user on 18.06.2020.
 //
-#include <gtest/gtest.h>
 #include <array_list.hpp>
+#include <gtest/gtest.h>
 #include <linked_list.hpp>
 
-TEST(linked_list ,all_tests) {
-    {std::cout << "--------------------Array_list tests--------------------" << std::endl;
+TEST(linked_list, all_tests) {
+    {
+        std::cout << "--------------------Array_list tests--------------------" << std::endl;
         array_list<int> arr{1, 2, 3, 4, 5};
         int j = 0;
         for (auto i : arr) {
@@ -99,7 +100,7 @@ TEST(linked_list ,all_tests) {
         std::cout << "arr.dequeue is working" << std::endl;
         temp = arr.pop();
         assert(temp == 6);
-        assert(arr[arr.length()-1] == 5);
+        assert(arr[arr.length() - 1] == 5);
         assert(arr.length() == 4);
         std::cout << "arr.pop is working" << std::endl;
     }
@@ -121,7 +122,10 @@ TEST(linked_list ,all_tests) {
     std::cout << "--------------------End of array_list tests--------------------" << std::endl;
 }
 
-TEST (array_list, all_tests_for_linked_list) {
+
+
+
+TEST(array_list, all_tests_for_linked_list) {
     std::cout << "--------------------Linked_list tests--------------------" << std::endl;
     {
         linked_list<int> arr{1, 2, 3, 4};
@@ -171,10 +175,46 @@ TEST (array_list, all_tests_for_linked_list) {
     }
     {
         linked_list<int> linkedList = {1, 2, 3, 4};
-        linkedList.append(5); //!!!
-        for (auto element :linkedList) {
-            std::cout<< element <<std::endl;
+        linkedList.append(5);//!!!
+        int i = 1;
+        for (auto element : linkedList) {
+            assert(i==element);
+            i++;
         }
     }
+//    {
+//        array_list<std::unique_ptr<int>> arr;
+//        arr.append(std::make_unique<int>(42)); // Вот тут у вас упадет программа с ошибкой, что у unique_ptr нет конструктора копирования или оператора присванивания
+//        assert(*arr[0].get() == 42);
+//    }
     std::cout << "--------------------End of linked_list tests--------------------" << std::endl;
 }
+
+
+
+//TEST(linked_and_array_list, all_tests) {
+//    std::cout << "--------------------Both lists tests--------------------" << std::endl;
+//    {
+//        array_list<int> arrayList{1, 2, 3, 4};
+//        linked_list<int> linkedList = {5, 6, 7, 8};
+//        arrayList.appendall(linkedList);
+//        int i = 1;
+//        for (auto &element : arrayList) {
+////            std::cout << element << std::endl;
+//            assert(element == i);
+//            i++;
+//        }
+//    }
+//            {
+//                linked_list<int> linkedList{1, 2, 3, 4};
+//                array_list<int> arrayList{5, 6, 7, 8};
+//                linkedList.appendall(arrayList);
+//                int i = 0;
+//                for (auto element : linkedList) {
+//                    i++;
+////                    std::cout << element << std::endl;
+//                    assert(element == i);
+//                }
+//    }
+//    std::cout << "--------------------End of both lists tests--------------------" << std::endl;
+//}
