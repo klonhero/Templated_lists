@@ -59,13 +59,13 @@ public:
     void append(const element_type &value);
     void prepend(const element_type &value);
     template<typename ICollection>
-    void appendall(const ICollection &arr);
+    void appendall(ICollection &arr);
     void insertat(const element_type &value, int index);
     void removeat(int index);
     void removeall();
     T pop();
     T dequeue();
-    int length() const;
+    [[nodiscard]] int length() const;
     T getat(int index) const;
     T &operator[](int index);
     const T &operator[](int index) const;
@@ -242,6 +242,10 @@ void linked_list<T>::removeat(int index) {
     if (index > size_) {
         throw std::invalid_argument("Invalid argument: index bigger than size");
     }
+    if(index == 0) {
+        dequeue();
+        return;
+    }
     auto temp = head_;
     node<element_type> *temp_previous;
     for (int i = 0; i < index; i++) {
@@ -265,11 +269,11 @@ void linked_list<T>::removeall() {
 }
 template<typename T>
 template<typename ICollection>
-void linked_list<T>::appendall(const ICollection &arr) {
+void linked_list<T>::appendall(ICollection &arr) {
     tail_->setnext(create_list(arr.length()));
-    for (int i = 0; i < arr.length(); i++) {
+    for (auto element:arr) {
         tail_ = tail_->getnext();
-        tail_->set(arr.getat(i));
+        tail_->set(element);
     }
     size_ += arr.length();
 }
@@ -282,17 +286,18 @@ T linked_list<T>::pop() {
     for (int i = 0; i < size_ - 1; i++) {
         temp = temp->getnext();
     }
-    size_ = 0;
+    size_ --;
 }
 template<typename T>
 T linked_list<T>::dequeue() {
     if (size_ == 0) {
-        throw std::invalid_argument("you can't use pop nothing to return (size = 0)");
+        throw std::invalid_argument("you can't use dequeue nothing to return (size = 0)");
     }
     auto temp = head_;
     head_ = head_->getnext();
     element_type temp_2 = temp->get();
     delete temp;
+    size_--;
     return temp_2;
 }
 

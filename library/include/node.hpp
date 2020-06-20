@@ -10,8 +10,8 @@ class node {
 
 public:
     node(const node &Node);
+    node();
     explicit node(T value);
-    node() = default;
     node<T> &operator=(const node &Node);
     T& get();           //return value_
     void set(T value);       //set value in value_
@@ -20,11 +20,11 @@ public:
 };
 
 
-template<typename T>
-node<T>::node(const node &Node) {
-    value_ = Node.value_;
-    next_ = nullptr;
-}
+//template<typename T>
+//node<T>::node(const node &Node) {
+//    value_ = Node.value_;
+//    next_ = nullptr;
+//}
 
 //template<typename T>
 //node<T>::node(T value, node *next) : value_(value), next_(next) {
@@ -60,5 +60,9 @@ void node<T>::setnext(node *next) {
 }
 template<typename T>
 node<T>::node(T value) {
+    next_ = nullptr;
+}
+template<typename T>
+node<T>::node() {
     next_ = nullptr;
 }
